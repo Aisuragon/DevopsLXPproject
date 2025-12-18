@@ -1,24 +1,24 @@
 name: CI-CD
 
 on:
-push:
-branches: [ main ]
-pull_request:
-branches: [ main ]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-check:
-runs-on: ubuntu-latest
-steps:
-- name: Checkout code
-uses: actions/checkout@v4
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-- name: Vérifier que la page existe
-run: |
-test -f index.nginx-debian.html
+      - name: Vérifier que la page existe
+        run: |
+          test -f index.nginx-debian.html
 
-- name: Vérifier la configuration Docker Compose
-run: |
-docker --version
-docker compose version || echo "compose plugin manquant"
-docker compose config
+      - name: Vérifier la configuration Docker Compose
+        run: |
+          docker --version
+          docker compose version || echo "compose plugin manquant"
+          docker compose config
