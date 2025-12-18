@@ -2,18 +2,8 @@ version: "3.9"
 
 services:
   web:
-    image: ghcr.io/aisuragon/devopslxpproject:latest
+    image: a6du/devopslxp:latest
     container_name: devopslxp-web
     ports:
       - "8080:80"
     restart: unless-stopped
-    networks:
-      devops_net:
-        ipv4_address: 172.20.0.10
-
-networks:
-  devops_net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/24
