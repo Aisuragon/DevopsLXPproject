@@ -1,62 +1,28 @@
-name: Phase 3 - Build, Push & Deploy
+name: Phase 3 - Build & Push Docker Image (Docker Hub)
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build_push_deploy:
-    runs-on: self-hosted
-
-    permissions:
-      contents: read
-      packages: write
+  build_push:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Define image name
-        shell: bash
-        run: |
-          set -e
-          echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}:latest" >> "$GITHUB_ENV"
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Login to GitHub Container Registry
-        shell: bash
-        run: |
-          set -e
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-
-      - name: Build and push Docker image
-        shell: bash
-        run: |
-          set -e
-          docker build -t "$IMAGE" .
-          docker push "$IMAGE"
-
-      - name: Setup SSH
-        shell: bash
-        run: |
-          set -e
-          mkdir -p /tmp/gha-ssh
-          printf "%s\n" "${{ secrets.VM_SSH_KEY }}" > /tmp/gha-ssh/id_ed25519
-          chmod 600 /tmp/gha-ssh/id_ed25519
-          ssh-keyscan -H "${{ secrets.VM_HOST }}" > /tmp/gha-ssh/known_hosts
-
-      - name: Deploy on PROD VM
-        shell: bash
-        run: |
-          set -e
-          ssh \
-            -i /tmp/gha-ssh/id_ed25519 \
-            -o UserKnownHostsFile=/tmp/gha-ssh/known_hosts \
-            -o StrictHostKeyChecking=yes \
-            "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}" '
-              set -e
-              cd /opt/lxp-web/DevopsLXPproject
-              git pull
-              docker compose pull
-              docker compose up -d
-              docker image prune -f
-            '
+      - name: Build & Push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            a6du/devopslxp:${{ github.sha }}
+            a6du/devopslxp:latest
