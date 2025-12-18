@@ -13,22 +13,22 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Define image
+      - name: Define image name
         shell: bash
         run: |
           set -e
           echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}:latest" >> "$GITHUB_ENV"
 
-      - name: Login to GHCR
+      - name: Login to GitHub Container Registry
         shell: bash
         run: |
           set -e
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build & push image
+      - name: Build and push Docker image
         shell: bash
         run: |
           set -e
@@ -40,17 +40,17 @@ jobs:
         run: |
           set -e
           mkdir -p /tmp/gha-ssh
-          echo "${{ secrets.VM_SSH_KEY }}" > "$RUNNER_TEMP/ssh/id_ed25519"
-          chmod 600 /tmp/gha-ssh/id_ed25519"
-          ssh-keyscan -H "${{ secrets.VM_HOST }}" > "$RUNNER_TEMP/ssh/known_hosts"
+          printf "%s\n" "${{ secrets.VM_SSH_KEY }}" > /tmp/gha-ssh/id_ed25519
+          chmod 600 /tmp/gha-ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.VM_HOST }}" > /tmp/gha-ssh/known_hosts
 
       - name: Deploy on PROD VM
         shell: bash
         run: |
           set -e
           ssh \
-            -i /tmp/gha-ssh/id_ed25519" \
-            -o UserKnownHostsFile=/tmp/gha-ssh/known_hosts" \
+            -i /tmp/gha-ssh/id_ed25519 \
+            -o UserKnownHostsFile=/tmp/gha-ssh/known_hosts \
             -o StrictHostKeyChecking=yes \
             "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}" '
               set -e
