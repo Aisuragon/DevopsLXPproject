@@ -1,4 +1,4 @@
-name: Phase 3 - Build & Deploy (self-hosted)
+name: Phase 3 - Build, Push & Deploy
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Define image name
+      - name: Define image
         run: |
           echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}:latest" >> $GITHUB_ENV
 
@@ -24,15 +24,25 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build and push image
+      - name: Build & push image
         run: |
           docker build -t "$IMAGE" .
           docker push "$IMAGE"
 
-      - name: Deploy with Docker Compose
+      - name: Setup SSH
         run: |
-          cd /opt/lxp-web/DevopsLXPproject
-          git pull
-          docker compose pull
-          docker compose up -d
-          docker image prune -f
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.VM_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy on PROD VM
+        run: |
+          ssh "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}" '
+            set -e
+            cd /opt/lxp-web/DevopsLXPproject
+            git pull
+            docker compose pull
+            docker compose up -d
+            docker image prune -f
+          '
