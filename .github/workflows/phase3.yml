@@ -39,10 +39,9 @@ jobs:
         shell: bash
         run: |
           set -e
-          : "${RUNNER_TEMP:?RUNNER_TEMP is not set}"
-          mkdir -p "$RUNNER_TEMP/ssh"
+          mkdir -p /tmp/gha-ssh
           echo "${{ secrets.VM_SSH_KEY }}" > "$RUNNER_TEMP/ssh/id_ed25519"
-          chmod 600 "$RUNNER_TEMP/ssh/id_ed25519"
+          chmod 600 /tmp/gha-ssh/id_ed25519"
           ssh-keyscan -H "${{ secrets.VM_HOST }}" > "$RUNNER_TEMP/ssh/known_hosts"
 
       - name: Deploy on PROD VM
@@ -50,8 +49,8 @@ jobs:
         run: |
           set -e
           ssh \
-            -i "$RUNNER_TEMP/ssh/id_ed25519" \
-            -o UserKnownHostsFile="$RUNNER_TEMP/ssh/known_hosts" \
+            -i /tmp/gha-ssh/id_ed25519" \
+            -o UserKnownHostsFile=/tmp/gha-ssh/known_hosts" \
             -o StrictHostKeyChecking=yes \
             "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}" '
               set -e
