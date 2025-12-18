@@ -22,3 +22,16 @@ jobs:
           docker --version
           docker compose version || echo "compose plugin manquant"
           docker compose config
+
+  deploy_vm:
+    needs: check
+    if: github.ref == 'refs/heads/main'
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code (sur la VM)
+        uses: actions/checkout@v4
+
+      - name: Deploy with Docker Compose
+        run: |
+          docker compose up -d --build
+          docker compose ps
