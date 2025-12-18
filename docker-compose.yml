@@ -1,1 +1,22 @@
+version: "3.9"
 
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: devopslxp-web
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      devops_net:
+        ipv4_address: 172.20.0.10
+
+networks:
+  devops_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/24
