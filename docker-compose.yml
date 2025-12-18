@@ -2,9 +2,7 @@ version: "3.9"
 
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/aisuragon/devopslxpproject:latest
     container_name: devopslxp-web
     ports:
       - "8080:80"
@@ -17,6 +15,5 @@ networks:
   devops_net:
     driver: bridge
     ipam:
-      driver: default
       config:
         - subnet: 172.20.0.0/24
