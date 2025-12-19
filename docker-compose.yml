@@ -15,10 +15,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.20.0.0/24services:
-  web:
-    image: a6du/devopslxp:latest
-    container_name: devopslxp-web
-    ports:
-      - "8080:80"
-    restart: unless-stopped
+        - subnet: 172.20.0.0/24
