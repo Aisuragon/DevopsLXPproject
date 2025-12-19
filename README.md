@@ -13,7 +13,7 @@
 ⠀⠀⠀⠀⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀ 
 ⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠿⠿⠿⠛⠉
------------------------------------
+------------------------------------
 DevopsLXP – Projet CI/CD Web
 Ce projet montre la mise en place d’une chaîne CI/CD complète pour une application web statique servie par Nginx dans un conteneur Docker.
 Le code est hébergé sur GitHub, la CI/CD est gérée par GitHub Actions et le déploiement se fait sur une VM Ubuntu via un runner self‑hosted.
