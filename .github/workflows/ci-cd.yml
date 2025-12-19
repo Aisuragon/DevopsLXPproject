@@ -50,12 +50,17 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Marquer le dépôt comme safe
+      # IMPORTANT : tout ce qui touche au dépôt local est ici
+      - name: Marquer le dépôt comme safe et fixer les droits
+        shell: bash
         run: |
-          git config --global --add safe.directory /home/enzo/LxpProject/DevopsLXPproject
+          REPO=/home/enzo/LxpProject/DevopsLXPproject
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+          # Dire à Git que ce dépôt est sûr pour cet utilisateur
+          git config --global --add safe.directory "$REPO"
+
+          # S'assurer que le runner possède le dépôt (corrige FETCH_HEAD)
+          sudo chown -R "$(whoami)":"$(whoami)" "$REPO"    # [web:214]
 
       - name: Déployer avec Docker Compose
         shell: bash
@@ -63,8 +68,10 @@ jobs:
           set -e
           cd /home/enzo/LxpProject/DevopsLXPproject
 
+          # Mettre le code à jour (maintenant les droits sont ok)
           git pull origin main
 
+          # Déployer la nouvelle image
           docker compose pull
           docker compose down
           docker compose up -d
